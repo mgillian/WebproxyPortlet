@@ -19,10 +19,45 @@
 
 --%>
 
+<%-- Author: Dustin Schultz | Version $Id$ --%>
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
-<portlet:resourceURL var="requestsUrl" escapeXml="false"/>
-<c:set var="n"><portlet:namespace/></c:set>
 
-<div id="${n}">
-    hello
+<portlet:actionURL var="savePreferencesUrl">
+    <portlet:param name="action" value="savePreferences"/>
+</portlet:actionURL>
+
+<div id="${n}jasigWeatherPortlet" class="jasigWeatherPortlet">
+
+    <div class="passwords">
+
+        <h2><spring:message code="edit.proxy.title"/></h2>
+        <form id="${n}addLocationForm" class="select-location-form" action="${savePreferencesUrl}" method="post">
+        <table id="${n}savedLocationsTable">
+            <thead>
+                <tr>
+                    <th><spring:message code="edit.proxy.column.name"/></th>
+                    <th><spring:message code="edit.proxy.column.value"/></th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="preferredParameter" items="${preferredParameters }">
+                        <tr>
+                            <td>${preferredParameter.key }</td>
+                            <c:choose>
+                                <c:when test="${preferredParameter.value.secured == true }">
+                                    <td><input type="password" name="${preferredParameter.key}" value="${preferredParameter.value.value }" /></td>
+                                </c:when>
+                                <c:otherwise>
+                                    <td><input type="text" name="${preferredParameter.key}" value="${preferredParameter.value.value}" /></td>
+                                </c:otherwise>
+                            </c:choose>
+                        </tr>
+                </c:forEach>
+            </tbody>
+        </table>
+        <spring:message var="savePreferencesLabel" code="edit.proxy.save.preferences"/>
+        <input type="submit" value="${savePreferencesLabel }" class="portlet-form-button"/>
+        
+        </form>
+    </div>
 </div>

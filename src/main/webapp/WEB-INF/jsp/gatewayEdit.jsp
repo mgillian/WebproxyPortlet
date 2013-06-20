@@ -35,21 +35,23 @@
         <table id="${n}savedLocationsTable">
             <thead>
                 <tr>
-                    <th><spring:message code="edit.proxy.column.order"/></th>
                     <th><spring:message code="edit.proxy.column.name"/></th>
-                    <th><spring:message code="edit.proxy.column.userId"/></th>
-                    <th><spring:message code="edit.proxy.column.password"/></th>
+                    <th><spring:message code="edit.proxy.column.value"/></th>
                 </tr>
             </thead>
             <tbody>
-                <c:forEach var="app" items="${apps }">
-                    <c:forEach var="prop" items="${app.value}">
+                <c:forEach var="preferredParameter" items="${preferredParameters }">
                         <tr>
-                            <td>${app.key }</td>
-                            <td>${prop.key }</td>
-                            <td><input type="text" name="${prop.key}" value="${prop.value}" /></td>
+                            <td>${preferredParameter.key }</td>
+                            <c:choose>
+                                <c:when test="${preferredParameter.value.secured == true }">
+                                    <td><input type="password" name="${preferredParameter.key}" value="${preferredParameter.value.value }" /></td>
+                                </c:when>
+                                <c:otherwise>
+                                    <td><input type="text" name="${preferredParameter.key}" value="${preferredParameter.value.value}" /></td>
+                                </c:otherwise>
+                            </c:choose>
                         </tr>
-                    </c:forEach>
                 </c:forEach>
             </tbody>
         </table>
@@ -57,8 +59,5 @@
         <input type="submit" value="${savePreferencesLabel }" class="portlet-form-button"/>
         
         </form>
-
-        <portlet:renderURL var="formDoneAction" portletMode="VIEW" windowState="NORMAL"/>
-        <p><button onclick="window.location='${formDoneAction}'" class="portlet-form-button"><spring:message code="edit.done.button"/></button></p>
     </div>
 </div>

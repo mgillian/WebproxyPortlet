@@ -45,9 +45,11 @@
         <property name="location" value="classpath:configuration.properties" />
     </bean>
 
+    <util:properties id="props" location="classpath:configuration.properties"/>
+
     <!-- Message source for this context, loaded from localized "messages_xx" files -->
     <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource"
-        p:basenames="i18n/messages" p:useCodeAsDefaultMessage="true"/>
+        p:basenames="messages" p:useCodeAsDefaultMessage="true"/>
 
     <bean class="org.apache.http.impl.conn.PoolingClientConnectionManager"
         p:maxTotal="50" p:defaultMaxPerRoute="10"/>

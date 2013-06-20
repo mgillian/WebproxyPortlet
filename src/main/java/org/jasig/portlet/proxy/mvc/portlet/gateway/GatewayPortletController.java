@@ -23,6 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -42,7 +46,9 @@ import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 @Controller
 @RequestMapping("VIEW")
 public class GatewayPortletController {
-	
+
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+    
 	@Autowired(required=false)
 	private String viewName = "gateway";
 	
@@ -80,8 +86,9 @@ public class GatewayPortletController {
 		for (Map.Entry<HttpContentRequestImpl, List<String>> requestEntry : entry.getContentRequests().entrySet()){
 			
 			// run each content request through any configured preinterceptors
-			// before adding it to the list
-			final HttpContentRequestImpl contentRequest = requestEntry.getKey();
+			// before adding it to the list.  Use a clone so that future changes to environment
+			// will accurately be intercepted.
+			final HttpContentRequestImpl contentRequest = requestEntry.getKey().duplicate();
 			for (String interceptorKey : requestEntry.getValue()) {
 				final IPreInterceptor interceptor = applicationContext.getBean(interceptorKey, IPreInterceptor.class);
 				interceptor.intercept(contentRequest, portletRequest);

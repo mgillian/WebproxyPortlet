@@ -45,17 +45,17 @@ public interface IFormField {
 	public String[] getValues();
 	
 	/**
-	 * isSecured() returns whether the field is encrypted and should be displayed obscured
+	 * getSecured() returns whether the field is encrypted and should be displayed obscured
 	 * to the user
 	 * @return true if field should be encrypted and secured, false otherwise
 	 */
-	public boolean isSecured();
+	public boolean getSecured();
 	
 	/**
-	 * isSecured(boolean) changes whether the field should be encrypted and obscured
+	 * setSecured(boolean) changes whether the field should be encrypted and obscured
 	 * @param isSecured
 	 */
-	public void isSecured(boolean isSecured);
+	public void setSecured(boolean isSecured);
 	
 	/**
 	 * duplicate() copies the data from the current IFormField into the passed-in parameter

@@ -27,7 +27,7 @@
     <c:forEach items="${ entries }" var="entry">
         <p class="entry">
             
-            <a href="javascript:;" target="_blank">
+            <a href="javascript:;" target="_self">
                 <img src="${entry.iconUrl}" style="vertical-align: middle; text-decoration: none; padding-right: 10px;"/>${ entry.name }
             </a>
         </p>
@@ -50,14 +50,13 @@
                             .attr("action", contentRequest.proxiedLocation)
                             .attr("method", contentRequest.method);
                         
-                        $.each(contentRequest.parameters, function (key, values) {
-                            $(values).each(function (idx, value) {
-                                form.append($(document.createElement("input")).attr("name", key).attr("value", value));
+                        $.each(contentRequest.parameters, function (key, formFields) {
+                            $(formFields).each(function (idx, formField) {
+                                form.append($(document.createElement("input")).attr("name", key).attr("value", formField.value));
                             });
                         });
-                        console.log(form);
 
-                        form.submit();
+                        form.appendTo("body").submit();
                     } else {
                         window.location = contentRequest.proxiedLocation;
                     }

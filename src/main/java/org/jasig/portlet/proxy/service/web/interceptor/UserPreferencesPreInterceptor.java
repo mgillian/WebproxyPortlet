@@ -16,31 +16,28 @@ import org.springframework.stereotype.Service;
 public class UserPreferencesPreInterceptor implements IPreInterceptor {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private String preferrencesRegex;
+    private String preferencesRegex;
     
-    @Value("${login.preferences.regex}")
-    public void setPreferrencesRegex(String preferrencesRegex) {
-        this.preferrencesRegex = preferrencesRegex;
+    @Value("#{props['login.preferences.regex']}")
+    public void setPreferencesRegex(String preferencesRegex) {
+        this.preferencesRegex = preferencesRegex;
     }
     
 	@Override
 	public void intercept(HttpContentRequestImpl proxyRequest,
 			PortletRequest portletRequest) {
-		logger.warn("UserPreferencesPreInterceptor.intercept");
-		logger.warn("regex: " + preferrencesRegex);
-		// TODO Auto-generated method stub
+		
 		// replace the portlet preference fields with user specific entries
-        PortletPreferences prefs = portletRequest.getPreferences();
-
+		PortletPreferences prefs = portletRequest.getPreferences();
+		
 		Map<String, IFormField> parameters = proxyRequest.getParameters();
 		for (String parameterKey: parameters.keySet()) {
 			String[] parameterValues = parameters.get(parameterKey).getValues();
 			for (int i = 0; i < parameterValues.length; i++) {
 				String parameterValue = parameterValues[i];
-				if (parameterValue.matches(preferrencesRegex)) {
+				if (parameterValue.matches(preferencesRegex)) {
 					String preferredValue = prefs.getValue(parameterValue, parameterValue);
 					parameterValues[i] = preferredValue;
-					logger.warn("key: " + parameterKey + ", substituting parameter value: " + preferredValue);
 				}
 		    }
 		}

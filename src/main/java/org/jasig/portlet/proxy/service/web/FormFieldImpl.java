@@ -4,14 +4,19 @@ import org.jasig.portlet.proxy.service.IFormField;
 
 public class FormFieldImpl implements IFormField {
 	
-	private String name;
-	private String[] values;
-	private boolean secured;
+	private String name = "blankField";
+	private String[] values = new String[1];
+	private boolean secured = false;
 	
 	public FormFieldImpl() {
-		name = "blankField";
-		values = new String[1];
-		secured = false;
+	}
+	
+	public FormFieldImpl(String name, String value) {
+		this(name, value, false);
+	}
+	
+	public FormFieldImpl(String name, String value, boolean secured) {
+		this(name, new String[]{value}, secured);
 	}
 	
 	public FormFieldImpl(String name, String[] values) {
@@ -55,18 +60,20 @@ public class FormFieldImpl implements IFormField {
 	}
 
 	@Override
-	public boolean isSecured() {
+	public boolean getSecured() {
 		return this.secured;
 	}
 
 	@Override
-	public void isSecured(boolean isSecured) {
+	public void setSecured(boolean isSecured) {
 		this.secured = isSecured;
 	}
 
 	@Override
 	public void duplicate(IFormField copy) {
 		copy.setName(this.name);
+		copy.setSecured(this.getSecured());
+		
 		String[] values = this.getValues();
 		String[] copiedValues = new String[values.length];
 		System.arraycopy(values, 0, copiedValues, 0, values.length);
