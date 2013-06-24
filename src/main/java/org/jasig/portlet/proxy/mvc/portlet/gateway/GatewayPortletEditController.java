@@ -30,6 +30,7 @@ import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
 import org.jasig.portlet.proxy.mvc.IViewSelector;
 import org.jasig.portlet.proxy.mvc.portlet.gateway.GatewayEntry;
+import org.jasig.portlet.proxy.security.IStringEncryptionService;
 import org.jasig.portlet.proxy.service.IFormField;
 import org.jasig.portlet.proxy.service.web.FormFieldImpl;
 import org.jasig.portlet.proxy.service.web.HttpContentRequestImpl;
@@ -49,9 +50,16 @@ public class GatewayPortletEditController {
 
     private String preferencesRegex;
     
-    @Value("#{props['login.preferences.regex']}")
+    @Value("${login.preferences.regex}")
     public void setPreferencesRegex(String preferencesRegex) {
     	this.preferencesRegex = preferencesRegex;
+    }
+    
+    private IStringEncryptionService stringEncryptionService;
+    
+    @Autowired(required=false)
+    public void setStringEncryptionService(IStringEncryptionService stringEncryptionService) {
+    	this.stringEncryptionService = stringEncryptionService;
     }
     
     @Autowired(required=false)
@@ -86,11 +94,15 @@ public class GatewayPortletEditController {
                     String[] parameterValues = parameter.getValues();
                     for (int i = 0; i < parameterValues.length; i++) {
                         String parameterValue = parameterValues[i];
-                        logger.warn("regex: " + preferencesRegex);
                         if (parameterValue.matches(preferencesRegex)) {
                             
                             // retrieve the preference and stuff the value here....
                             String preferredValue = prefs.getValue(parameterValue, parameterValue);
+                            // if preferredValue is the same as the parameterValue, then preferredValue
+                            // did not come from preferences and does not need to be decrypted
+                            if (!preferredValue.equals(parameterValue) && stringEncryptionService != null && parameter.getSecured()) {
+                            	preferredValue = stringEncryptionService.decrypt(preferredValue);
+                            }
                             IFormField formField = new FormFieldImpl(parameterKey, preferredValue, parameter.getSecured());
                             preferredParameters.put(parameterValue, formField);
                         }
@@ -113,9 +125,42 @@ public class GatewayPortletEditController {
         while (parameterNames.hasMoreElements()) {
             String parameterName = parameterNames.nextElement();
             String parameterValue = request.getParameter(parameterName);
+            IFormField parameter = getPortletPreferenceFormField(parameterName);
+            if (stringEncryptionService != null && parameter != null && parameter.getSecured()) {
+            	parameterValue = stringEncryptionService.encrypt(parameterValue);
+            }
             prefs.setValue(parameterName, parameterValue);
             prefs.store();
         }
         response.setPortletMode(PortletMode.VIEW);
+    }
+    
+    /**
+     * getPortletPreferenceformField() returns the IFormField from gatewayEntries() where the value
+     * matches the requested fieldName.  The fieldName will match the property format
+     * specified by login.preferences.regex
+     * @param fieldName the name of the field being searched for.
+     * @see IFormField
+     */
+    private IFormField getPortletPreferenceFormField(String fieldName) {
+    	IFormField formField = null;
+    	final List<GatewayEntry> entries =  (List<GatewayEntry>) applicationContext.getBean("gatewayEntries", List.class);
+        for (GatewayEntry entry: entries) {
+            for (Map.Entry<HttpContentRequestImpl, List<String>> requestEntry : entry.getContentRequests().entrySet()){
+                final HttpContentRequestImpl contentRequest = requestEntry.getKey();
+                Map<String, IFormField> parameters = contentRequest.getParameters();
+                for (String parameterNames: parameters.keySet()) {
+                	IFormField parameter = parameters.get(parameterNames);
+                	if (parameter.getValue().equals(fieldName)) {
+                		formField = parameter;
+                    	break;
+                	}
+                }
+            }
+            if (formField != null) {
+            	break;
+            }
+        }
+        return formField;
     }
 }

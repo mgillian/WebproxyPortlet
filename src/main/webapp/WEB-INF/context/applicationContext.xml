@@ -131,5 +131,14 @@
         <property name="prefix" value="/WEB-INF/jsp/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
+    
+    <bean id="stringEncryptionService" class="org.jasig.portlet.proxy.security.JasyptPBEStringEncryptionServiceImpl">
+        <property name="stringEncryptor">
+            <bean class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
+                 <property name="password" value="verylongsalt"/>
+            </bean>
+        </property>
+    </bean>
+    
 
 </beans>
