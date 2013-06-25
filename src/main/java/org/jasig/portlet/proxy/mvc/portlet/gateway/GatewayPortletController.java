@@ -94,7 +94,6 @@ public class GatewayPortletController {
 			contentRequests.add(contentRequest);
 		}
 		mv.addObject("contentRequests", contentRequests);
-
 		// we don't want this response to be cached by the browser since it may
 		// include one-time-only authentication tokens
         portletResponse.getCacheControl().setExpirationTime(1);

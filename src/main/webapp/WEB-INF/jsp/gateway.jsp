@@ -32,7 +32,14 @@
             </a>
         </p>
     </c:forEach>
+    
 </div>
+
+<div class="edit-link">
+    <portlet:renderURL var="editUrl"  portletMode="EDIT" windowState="MAXIMIZED" />
+    <a href="${editUrl}"><spring:message code="edit.proxy.show.preferences.link"/></a>
+</div>
+    
 
 <script type="text/javascript">
     up.jQuery(function () {
@@ -73,10 +80,10 @@
                 }
             };
             
-    		$("#${n} .entry a").each(function (idx, link) {
-    			$(link).click(function () {
-    				$.get(
-						"${ requestsUrl }", 
+            $("#${n} .entry a").each(function (idx, link) {
+                $(link).click(function () {
+                    $.get(
+                    	"${ requestsUrl }", 
 						{ index: idx }, 
 						function (data) { 
 							var contentRequests = data.contentRequests;
