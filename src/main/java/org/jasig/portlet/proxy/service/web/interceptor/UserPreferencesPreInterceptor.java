@@ -47,7 +47,7 @@ public class UserPreferencesPreInterceptor implements IPreInterceptor {
 					// if preferredValue is the same as the parameterValue, then preferredValue
 					// did not come from preferences and does not need to be decrypted
 					if (!preferredValue.equals(parameterValue) && stringEncryptionService != null && parameter.getSecured()) {
-						logger.warn("decrypting preferredValue '" + preferredValue + "' for parameterKey: '" + parameterKey);
+						logger.debug("decrypting preferredValue '" + preferredValue + "' for parameterKey: '" + parameterKey);
 						preferredValue = stringEncryptionService.decrypt(preferredValue);
 					}
 					parameterValues[i] = preferredValue;

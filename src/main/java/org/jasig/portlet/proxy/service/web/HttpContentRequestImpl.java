@@ -36,6 +36,7 @@ public class HttpContentRequestImpl extends GenericContentRequestImpl {
 
     private Map<String, IFormField> parameters;
     private Map<String, String> headers;
+    private String javascript;
     private String method;
     private boolean isForm;
     
@@ -81,10 +82,19 @@ public class HttpContentRequestImpl extends GenericContentRequestImpl {
 
     }
 
+    /**
+     * Returns a map of parameters for the gateway login form.  Map Keys are user-friendly logical names for the parameter.
+     * @return Map of parameters for the gateway login form.
+     */
 	public Map<String, IFormField> getParameters() {
 		return parameters;
 	}
 
+    /**
+     * Sets a map of parameters for the gateway login form.  The Map's keys are user-friendly logical names for
+     * each parameter.
+     * @param parameters
+     */
 	public void setParameters(Map<String, IFormField> parameters) {
 		this.parameters = parameters;
 	}
@@ -112,8 +122,16 @@ public class HttpContentRequestImpl extends GenericContentRequestImpl {
 	public void setForm(boolean isForm) {
 		this.isForm = isForm;
 	}
-	
-	/**
+
+    public String getJavascript() {
+        return javascript;
+    }
+
+    public void setJavascript(String javascript) {
+        this.javascript = javascript;
+    }
+
+    /**
 	 * duplicate() creates a duplicate of the HttpContentRequest without
 	 * using clone().  All objects are unique, but the data contained within
 	 * the objects is the same
@@ -121,7 +139,7 @@ public class HttpContentRequestImpl extends GenericContentRequestImpl {
 	 */
 	public HttpContentRequestImpl duplicate() {
 		HttpContentRequestImpl copy = new HttpContentRequestImpl();
-		copy.setMethod((String) this.getMethod());
+		copy.setMethod(this.getMethod());
 		copy.setForm(this.isForm());
 		copy.setProxiedLocation(this.getProxiedLocation());
 		

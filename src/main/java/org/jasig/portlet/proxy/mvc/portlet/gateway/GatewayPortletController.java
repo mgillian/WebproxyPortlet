@@ -18,28 +18,28 @@
  */
 package org.jasig.portlet.proxy.mvc.portlet.gateway;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import javax.portlet.RenderRequest;
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
-
 import org.jasig.portlet.proxy.mvc.IViewSelector;
 import org.jasig.portlet.proxy.service.web.HttpContentRequestImpl;
 import org.jasig.portlet.proxy.service.web.interceptor.IPreInterceptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.portlet.ModelAndView;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
+
+import javax.portlet.RenderRequest;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("VIEW")
@@ -64,41 +64,58 @@ public class GatewayPortletController {
 		final ModelAndView mv = new ModelAndView();
 		final List<GatewayEntry> entries =  (List<GatewayEntry>) applicationContext.getBean("gatewayEntries", List.class);
 		mv.addObject("entries", entries);
+
+        String openInNewPage = request.getPreferences().getValue("openInNewPage", "true");
+        mv.addObject("openInNewPage", openInNewPage);
 		
 		final String view = viewSelector.isMobile(request) ? mobileViewName : viewName;
 		mv.setView(view);
 		return mv;
 	}
-	
+
 	@ResourceMapping()
 	public ModelAndView showTarget(ResourceRequest portletRequest, ResourceResponse portletResponse, @RequestParam("index") int index) throws IOException {		
 		final ModelAndView mv = new ModelAndView("json");
-		
-		// get the requested gateway link entry from the list configured for
-		// this portlet
-		final List<GatewayEntry> entries =  (List<GatewayEntry>) applicationContext.getBean("gatewayEntries", List.class);
-		final GatewayEntry entry = entries.get(index);
 
-		// build a list of content requests
-		final List<HttpContentRequestImpl> contentRequests = new ArrayList<HttpContentRequestImpl>();
-		for (Map.Entry<HttpContentRequestImpl, List<String>> requestEntry : entry.getContentRequests().entrySet()){
-			
-			// run each content request through any configured preinterceptors
-			// before adding it to the list.  Use a clone so that future changes to environment
-			// will accurately be intercepted.
-			final HttpContentRequestImpl contentRequest = requestEntry.getKey().duplicate();
-			for (String interceptorKey : requestEntry.getValue()) {
-				final IPreInterceptor interceptor = applicationContext.getBean(interceptorKey, IPreInterceptor.class);
-				interceptor.intercept(contentRequest, portletRequest);
-			}
-			contentRequests.add(contentRequest);
-		}
-		mv.addObject("contentRequests", contentRequests);
-		// we don't want this response to be cached by the browser since it may
-		// include one-time-only authentication tokens
+        // get the requested gateway link entry from the list configured for
+        // this portlet
+        final List<GatewayEntry> entries =  (List<GatewayEntry>) applicationContext.getBean("gatewayEntries", List.class);
+        final GatewayEntry entry = entries.get(index);
+
+        // build a list of content requests
+        final List<HttpContentRequestImpl> contentRequests = new ArrayList<HttpContentRequestImpl>();
+        for (Map.Entry<HttpContentRequestImpl, List<String>> requestEntry : entry.getContentRequests().entrySet()){
+
+            // run each content request through any configured preinterceptors
+            // before adding it to the list.  Use a clone so that future changes to environment
+            // will accurately be intercepted.
+            final HttpContentRequestImpl contentRequest = requestEntry.getKey().duplicate();
+            for (String interceptorKey : requestEntry.getValue()) {
+                final IPreInterceptor interceptor = applicationContext.getBean(interceptorKey, IPreInterceptor.class);
+                interceptor.intercept(contentRequest, portletRequest);
+            }
+            contentRequests.add(contentRequest);
+        }
+        mv.addObject("contentRequests", contentRequests);
+        // we don't want this response to be cached by the browser since it may
+        // include one-time-only authentication tokens
         portletResponse.getCacheControl().setExpirationTime(1);
         portletResponse.getCacheControl().setUseCachedContent(false);
 
-		return mv;
-	}
+        return mv;
+    }
+
+    @ResourceMapping(value = "showTargetInNewWindow")
+    public String showTargetInNewWindow(ResourceRequest portletRequest, ResourceResponse portletResponse, Model model,
+                                              @RequestParam("index") int index) throws IOException {
+        model.addAttribute("index", index);
+
+        // we don't want this response to be cached by the browser since it may
+        // include one-time-only authentication tokens
+        portletResponse.getCacheControl().setExpirationTime(1);
+        portletResponse.getCacheControl().setUseCachedContent(false);
+
+        return "gatewayNewPage";
+    }
+
 }

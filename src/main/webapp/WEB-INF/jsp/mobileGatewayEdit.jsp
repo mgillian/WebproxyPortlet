@@ -40,15 +40,15 @@
                 </tr>
             </thead>
             <tbody>
-                <c:forEach var="preferredParameter" items="${preferredParameters }">
+                <c:forEach var="gatewayPreference" items="${preferredParameters }">
                         <tr>
-                            <td>${preferredParameter.key }</td>
+                            <td>${gatewayPreference.key }</td>
                             <c:choose>
-                                <c:when test="${preferredParameter.value.secured == true }">
-                                    <td><input type="password" name="${preferredParameter.key}" value="${preferredParameter.value.value }" /></td>
+                                <c:when test="${gatewayPreference.value.secured == true }">
+                                    <td><input type="password" name="${gatewayPreference.key}" value="${gatewayPreference.value.value }" /></td>
                                 </c:when>
                                 <c:otherwise>
-                                    <td><input type="text" name="${preferredParameter.key}" value="${preferredParameter.value.value}" /></td>
+                                    <td><input type="text" name="${gatewayPreference.key}" value="${gatewayPreference.value.value}" /></td>
                                 </c:otherwise>
                             </c:choose>
                         </tr>

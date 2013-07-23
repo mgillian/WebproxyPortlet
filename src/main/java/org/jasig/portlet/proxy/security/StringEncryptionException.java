@@ -20,7 +20,7 @@ package org.jasig.portlet.proxy.security;
 
 
 /**
- * A custom Exception for the email preview portlet that may be thrown as the result 
+ * A custom Exception for the Web Proxy portlet that may be thrown as the result
  * of a failure in encrypting/decrypting a string.
  *
  * @author Misagh Moayyed

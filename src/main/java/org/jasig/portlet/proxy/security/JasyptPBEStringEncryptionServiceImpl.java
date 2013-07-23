@@ -53,8 +53,6 @@ public class JasyptPBEStringEncryptionServiceImpl implements IStringEncryptionSe
 	public String encrypt(final String plaintext) {
 		if (this.encryptor == null) {
 			logger.error("encryptor not set");
-		} else {
-			logger.error("encryptor is set");
 		}
         try {
             return this.encryptor.encrypt(plaintext);
@@ -72,8 +70,6 @@ public class JasyptPBEStringEncryptionServiceImpl implements IStringEncryptionSe
 	public String decrypt(final String cryptotet) {
 		if (this.encryptor == null) {
 			logger.error("encryptor not set");
-		} else {
-			logger.error("encryptor is set");
 		}
       try {
 	        return this.encryptor.decrypt(cryptotet);

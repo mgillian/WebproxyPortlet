@@ -35,7 +35,7 @@ public class GatewayEntry {
 	private LinkedHashMap<HttpContentRequestImpl, List<String>> contentRequests = new LinkedHashMap<HttpContentRequestImpl, List<String>>();
 
 	/**
-	 * Get the display text for this link.
+	 * Get the display text for this link (user-friendly system name)
 	 * 
 	 * @return
 	 */
@@ -44,7 +44,7 @@ public class GatewayEntry {
 	}
 
 	/**
-	 * Set the display text for this link.
+	 * Set the display text (user-friendly system name) for this link.
 	 * 
 	 * @param name
 	 */

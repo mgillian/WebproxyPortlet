@@ -130,8 +130,10 @@
         <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
         <property name="prefix" value="/WEB-INF/jsp/"/>
         <property name="suffix" value=".jsp"/>
+        <property name="alwaysInclude" value="true"/>  <!-- To allow ResourceMapping to include full HTML JSP page -->
     </bean>
-    
+
+    <!-- CHANGE THE VALUE OF THE PASSWORD BEFORE USING THIS SERVICE!!  -->
     <bean id="stringEncryptionService" class="org.jasig.portlet.proxy.security.JasyptPBEStringEncryptionServiceImpl">
         <property name="stringEncryptor">
             <bean class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
@@ -139,6 +141,5 @@
             </bean>
         </property>
     </bean>
-    
 
 </beans>
