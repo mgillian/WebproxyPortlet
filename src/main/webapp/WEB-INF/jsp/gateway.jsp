@@ -27,14 +27,21 @@
 <div id="${n}">
     <c:forEach items="${ entries }" var="entry">
         <p class="entry">
-            
+        <c:set var="validation" value="${validations.get(entry.name)}" />
+        <c:if test="${validation == true}">      
             <a href="javascript:;" target="_self">
                 <img src="${entry.iconUrl}" style="vertical-align: middle; text-decoration: none; padding-right: 10px;"/>${ entry.name }
             </a>
+        </c:if>
+        <c:if test="${validation == false}">      
+            <a href="javascript:;" target="_self"></a>
+            <img src="${entry.iconUrl}" style="vertical-align: middle; text-decoration: none; padding-right: 10px;"/>${ entry.name } <spring:message code="portlet.preferences.missing"/>
+        </c:if>
         </p>
     </c:forEach>
     
 </div>
+
 
 <div class="edit-link">
     <portlet:renderURL var="editUrl"  portletMode="EDIT" />
@@ -50,25 +57,26 @@
     	$(document).ready(function () {
     		
             $("#${n} .entry a").each(function (idx, link) {
-                $(link).click(function () {
-                    <c:choose>
-                        <c:when test="${openInNewPage}">
-                            window.open("${newPageUrl}?index="+idx);
-                        </c:when>
-                        <c:otherwise>
-                            $.get(
-                            "${ requestsUrl }",
-                            { index: idx },
-                            function (data) {
-                                var contentRequests = data.contentRequests;
-                                webproxyGatewayHandleRequest($, contentRequests, 0, "${n}form");
-                                },
-                            "json"
-                            );
-                        </c:otherwise>
-                    </c:choose>
-                });
+	            $(link).click(function () {
+   	                <c:choose>
+   	                	<c:when test="${openInNewPage}">
+            	            window.open("${newPageUrl}?index="+idx);
+                	    </c:when>
+                    	<c:otherwise>
+                        	$.get(
+                            	"${ requestsUrl }",
+                            	{ index: idx },
+                            	function (data) {
+                            	    var contentRequests = data.contentRequests;
+                        	        webproxyGatewayHandleRequest($, contentRequests, 0, "${n}form");
+                    	            },
+                	            "json"
+            	                );
+        	            </c:otherwise>
+    	            </c:choose>
+	            });
     		});
+    		
     	});
     });
 </script>

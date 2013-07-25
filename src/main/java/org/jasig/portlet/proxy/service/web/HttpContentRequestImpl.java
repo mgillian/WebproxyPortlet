@@ -142,6 +142,7 @@ public class HttpContentRequestImpl extends GenericContentRequestImpl {
 		copy.setMethod(this.getMethod());
 		copy.setForm(this.isForm());
 		copy.setProxiedLocation(this.getProxiedLocation());
+		copy.setJavascript(this.getJavascript());
 		
 		Map<String, String> copyHeaders = new LinkedHashMap<String, String>();
 		copyHeaders.putAll(this.headers);
@@ -158,7 +159,6 @@ public class HttpContentRequestImpl extends GenericContentRequestImpl {
 			copyParameters.put(key, copiedValues);
 		}
 		copy.setParameters(copyParameters);
-		
 		return copy;
 	}
 }

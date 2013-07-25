@@ -39,9 +39,9 @@ import javax.portlet.PortletMode;
 import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Controller
 @RequestMapping("EDIT")
@@ -84,7 +84,7 @@ public class GatewayPortletEditController {
         
         // Look for any user-specified preference holders that are present in any of the gatewayEntry objects.
         // Store them in a list so that they can be edited.
-        Map<String,GatewayPreference> gatewayPreferences = new HashMap<String,GatewayPreference>();
+        Map<String,GatewayPreference> gatewayPreferences = new TreeMap<String,GatewayPreference>();
         for (GatewayEntry entry: entries) {
             for (Map.Entry<HttpContentRequestImpl, List<String>> requestEntry : entry.getContentRequests().entrySet()){
                 final HttpContentRequestImpl contentRequest = requestEntry.getKey();

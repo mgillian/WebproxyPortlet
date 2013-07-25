@@ -88,4 +88,10 @@ public class UserInfoUrlParameterizingPreInterceptor implements IPreInterceptor 
 
 	}
 
+	@Override
+	public boolean validate(HttpContentRequestImpl proxyRequest,
+			PortletRequest portletRequest) {
+		return true;
+	}
+
 }

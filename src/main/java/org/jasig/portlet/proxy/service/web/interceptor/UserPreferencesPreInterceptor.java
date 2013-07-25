@@ -46,7 +46,7 @@ public class UserPreferencesPreInterceptor implements IPreInterceptor {
 					String preferredValue = prefs.getValue(parameterValue, parameterValue);
 					// if preferredValue is the same as the parameterValue, then preferredValue
 					// did not come from preferences and does not need to be decrypted
-					if (!preferredValue.equals(parameterValue) && stringEncryptionService != null && parameter.getSecured()) {
+					if (preferredValue != null && !preferredValue.equals("") && !preferredValue.equals(parameterValue) && stringEncryptionService != null && parameter.getSecured()) {
 						logger.debug("decrypting preferredValue '" + preferredValue + "' for parameterKey: '" + parameterKey);
 						preferredValue = stringEncryptionService.decrypt(preferredValue);
 					}
@@ -54,5 +54,40 @@ public class UserPreferencesPreInterceptor implements IPreInterceptor {
 				}
 		    }
 		}
+	}
+
+
+	/**
+	 * validate() checks portlet preferences and confirms that all of the needed
+	 * preferences have been set.  The preferences could be set incorrectly, which 
+	 * will not be detected until the gateway entry is tried.  This simply validates 
+	 * that the preferences have been created and saved by the user.
+	 * @param proxyRequest 
+	 * @param portletRequest 
+	 * @return true if all portlet preferences have been set (are not blank), false if all have not been set.
+	 */
+	@Override
+	public boolean validate(HttpContentRequestImpl proxyRequest, PortletRequest portletRequest) {
+		boolean allPreferencesSet = true;
+		PortletPreferences prefs = portletRequest.getPreferences();
+
+		Map<String, IFormField> parameters = proxyRequest.getParameters();
+		for (String parameterKey: parameters.keySet()) {
+			IFormField parameter = parameters.get(parameterKey);
+			String[] parameterValues = parameter.getValues();
+			for (int i = 0; i < parameterValues.length; i++) {
+				String parameterValue = parameterValues[i];
+				if (parameterValue.matches(preferencesRegex)) {
+					
+					// look for the value for all portletPreferences fields
+					// if it doesn't find a preference for that field, value has not been set.
+					String preferredValue = prefs.getValue(parameterValue, null);
+					if (preferredValue == null || preferredValue.equals("")) {
+						allPreferencesSet = false;
+					}
+				}
+		    }
+		}
+		return allPreferencesSet;
 	}
 }

@@ -36,8 +36,10 @@ import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 import javax.portlet.RenderRequest;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -63,7 +65,23 @@ public class GatewayPortletController {
 	public ModelAndView getView(RenderRequest request){
 		final ModelAndView mv = new ModelAndView();
 		final List<GatewayEntry> entries =  (List<GatewayEntry>) applicationContext.getBean("gatewayEntries", List.class);
+		final Map<String, Boolean> validations = new HashMap<String, Boolean>();
+        for (GatewayEntry entry : entries) {
+	        for (Map.Entry<HttpContentRequestImpl, List<String>> requestEntry : entry.getContentRequests().entrySet()){
+	
+	            // run each content request through any configured preinterceptors to validate each entry
+	            final HttpContentRequestImpl contentRequest = requestEntry.getKey();
+	            for (String interceptorKey : requestEntry.getValue()) {
+	                final IPreInterceptor interceptor = applicationContext.getBean(interceptorKey, IPreInterceptor.class);
+	                boolean isValid = interceptor.validate(contentRequest, request);
+	                validations.put(entry.getName(), isValid);
+	            }
+	        }
+        }
+		
+		
 		mv.addObject("entries", entries);
+		mv.addObject("validations", validations);
 
         String openInNewPage = request.getPreferences().getValue("openInNewPage", "true");
         mv.addObject("openInNewPage", openInNewPage);
