@@ -36,7 +36,6 @@ public class HttpContentRequestImpl extends GenericContentRequestImpl {
 
     private Map<String, IFormField> parameters;
     private Map<String, String> headers;
-    private String javascript;
     private String method;
     private boolean isForm;
     
@@ -83,6 +82,17 @@ public class HttpContentRequestImpl extends GenericContentRequestImpl {
     }
 
     /**
+     * add a new parameter to the list of avaialble parameters.
+     * @param fieldName
+     * @param value
+     */
+    public void addParameter(String fieldName, String value) {
+    	IFormField field = new FormFieldImpl();
+    	field.setName(fieldName);
+    	field.setValue(value);
+    	parameters.put(fieldName, field);
+    }
+    /**
      * Returns a map of parameters for the gateway login form.  Map Keys are user-friendly logical names for the parameter.
      * @return Map of parameters for the gateway login form.
      */
@@ -123,14 +133,6 @@ public class HttpContentRequestImpl extends GenericContentRequestImpl {
 		this.isForm = isForm;
 	}
 
-    public String getJavascript() {
-        return javascript;
-    }
-
-    public void setJavascript(String javascript) {
-        this.javascript = javascript;
-    }
-
     /**
 	 * duplicate() creates a duplicate of the HttpContentRequest without
 	 * using clone().  All objects are unique, but the data contained within
@@ -142,7 +144,6 @@ public class HttpContentRequestImpl extends GenericContentRequestImpl {
 		copy.setMethod(this.getMethod());
 		copy.setForm(this.isForm());
 		copy.setProxiedLocation(this.getProxiedLocation());
-		copy.setJavascript(this.getJavascript());
 		
 		Map<String, String> copyHeaders = new LinkedHashMap<String, String>();
 		copyHeaders.putAll(this.headers);

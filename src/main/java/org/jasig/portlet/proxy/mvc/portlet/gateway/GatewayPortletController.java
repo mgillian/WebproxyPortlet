@@ -19,6 +19,7 @@
 package org.jasig.portlet.proxy.mvc.portlet.gateway;
 
 import org.jasig.portlet.proxy.mvc.IViewSelector;
+import org.jasig.portlet.proxy.service.web.ExternalLogic;
 import org.jasig.portlet.proxy.service.web.HttpContentRequestImpl;
 import org.jasig.portlet.proxy.service.web.interceptor.IPreInterceptor;
 import org.slf4j.Logger;
@@ -114,7 +115,18 @@ public class GatewayPortletController {
             }
             contentRequests.add(contentRequest);
         }
+
+        // add custom logic to the ModelAndView
+        for (ExternalLogic externalLogic: (List<ExternalLogic>) entry.getExternalLogic()) {
+        	String fieldName = externalLogic.getFieldName();
+        	String result = externalLogic.getResult(portletRequest.getPreferences());
+        	for (HttpContentRequestImpl contentRequest : contentRequests) {
+            	contentRequest.addParameter(fieldName, result);        		
+        	}
+        }
+        
         mv.addObject("contentRequests", contentRequests);
+
         // we don't want this response to be cached by the browser since it may
         // include one-time-only authentication tokens
         portletResponse.getCacheControl().setExpirationTime(1);
