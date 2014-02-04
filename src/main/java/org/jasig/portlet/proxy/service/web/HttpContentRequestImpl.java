@@ -19,7 +19,9 @@
 package org.jasig.portlet.proxy.service.web;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.portlet.PortletPreferences;
@@ -27,17 +29,18 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletSession;
 
 import org.jasig.portlet.proxy.service.GenericContentRequestImpl;
+import org.jasig.portlet.proxy.service.IFormField;
 import org.jasig.portlet.proxy.service.proxy.document.URLRewritingFilter;
 
 public class HttpContentRequestImpl extends GenericContentRequestImpl {
 
-    private Map<String, String[]> parameters;
+    private Map<String, IFormField> parameters;
     private Map<String, String> headers;
     private String method;
     private boolean isForm;
     
     public HttpContentRequestImpl() { 
-    	this.parameters = new HashMap<String, String[]>();
+    	this.parameters = new HashMap<String, IFormField>();
     	this.headers = new HashMap<String, String>();
     }
     
@@ -68,7 +71,8 @@ public class HttpContentRequestImpl extends GenericContentRequestImpl {
         final Map<String, String[]> params = request.getParameterMap();
         for (Map.Entry<String, String[]> param : params.entrySet()) {
         	if (!param.getKey().startsWith(HttpContentServiceImpl.PROXY_PORTLET_PARAM_PREFIX)) {
-				this.parameters.put(param.getKey(), param.getValue());
+        		IFormField formField = new FormFieldImpl(param.getKey(), param.getValue());
+				this.parameters.put(param.getKey(), formField);
         	}
         }
         
@@ -77,11 +81,11 @@ public class HttpContentRequestImpl extends GenericContentRequestImpl {
 
     }
 
-	public Map<String, String[]> getParameters() {
+	public Map<String, IFormField> getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(Map<String, String[]> parameters) {
+	public void setParameters(Map<String, IFormField> parameters) {
 		this.parameters = parameters;
 	}
 
@@ -108,5 +112,35 @@ public class HttpContentRequestImpl extends GenericContentRequestImpl {
 	public void setForm(boolean isForm) {
 		this.isForm = isForm;
 	}
-
+	
+	/**
+	 * duplicate() creates a duplicate of the HttpContentRequest without
+	 * using clone().  All objects are unique, but the data contained within
+	 * the objects is the same
+	 * @return a unique HttpContentRequestImpl object with the same data
+	 */
+	public HttpContentRequestImpl duplicate() {
+		HttpContentRequestImpl copy = new HttpContentRequestImpl();
+		copy.setMethod((String) this.getMethod());
+		copy.setForm(this.isForm());
+		copy.setProxiedLocation(this.getProxiedLocation());
+		
+		Map<String, String> copyHeaders = new LinkedHashMap<String, String>();
+		copyHeaders.putAll(this.headers);
+		copy.setHeaders(copyHeaders);
+		
+		// String[] needs to be copied manually, otherwise, you end up with the
+		// same object in the new HttpContentRequestImpl
+		Map<String, IFormField> copyParameters = new LinkedHashMap<String, IFormField>();
+		for (Entry<String, IFormField> requestEntry : this.getParameters().entrySet()){
+			String key = requestEntry.getKey();
+			IFormField values = requestEntry.getValue();
+			IFormField copiedValues = new FormFieldImpl();
+			values.duplicate(copiedValues);
+			copyParameters.put(key, copiedValues);
+		}
+		copy.setParameters(copyParameters);
+		
+		return copy;
+	}
 }
